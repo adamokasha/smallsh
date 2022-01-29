@@ -11,8 +11,6 @@ struct UserInput
 {
   char *command;
   char *args[512];
-  char *inputRedirect;
-  char *outputRedirect;
   char *inputFile;
   char *outputFile;
   bool isBackgroundProcess;
@@ -70,11 +68,26 @@ bool isEmptyString(char *buf)
   return false;
 }
 
+bool isInputCharacter(char *character)
+{
+  return strcmp(character, ">") == 0;
+}
+
+bool isOutputCharacter(char *character)
+{
+  return strcmp(character, "<") == 0;
+}
+
+bool isBackgroundExecChar(char *character)
+{
+  return strcmp(character, "&") == 0;
+}
+
 bool isArgument(char *str)
 {
   if (str == NULL)
     return false;
-  return (strcmp(str, "<") != 0) && (strcmp(str, ">") != 0) && (strcmp(str, "&") != 0);
+  return !(isInputCharacter(str) || isOutputCharacter(str) || isBackgroundExecChar(str));
 }
 
 char *handleExpansion(char *str)
@@ -148,11 +161,40 @@ void buildUserInput(char *buf, struct UserInput *userInput)
   {
     char *expanded = NULL;
     expanded = handleExpansion(token);
-    userInput->args[i] = calloc(strlen(expanded + 1), sizeof(char));
+    userInput->args[i] = calloc(strlen(expanded) + 1, sizeof(char));
     strcpy(userInput->args[i], expanded);
     token = strtok_r(NULL, " ", &savePtr);
     i++;
     expanded = NULL;
+  }
+
+  if (isInputCharacter(token))
+  {
+    token = strtok_r(NULL, " ", &savePtr);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+
+    userInput->inputFile = calloc(strlen(token) + 1, sizeof(char));
+    strcpy(userInput->inputFile, expanded);
+  }
+
+  token = strtok_r(NULL, " ", &savePtr);
+
+  if (isOutputCharacter(token))
+  {
+    token = strtok_r(NULL, " ", &savePtr);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+
+    userInput->outputFile = calloc(strlen(token) + 1, sizeof(char));
+    strcpy(userInput->outputFile, expanded);
+  }
+
+  token = strtok_r(NULL, " ", &savePtr);
+
+  if (isBackgroundExecChar(token))
+  {
+    userInput->isBackgroundProcess = true;
   }
 }
 
@@ -174,6 +216,7 @@ int main()
   char *buf = NULL;
   size_t buflen;
   struct UserInput *userInput = malloc(sizeof(struct UserInput));
+  userInput->isBackgroundProcess = false;
 
   prompt(&buf, &buflen);
   parseUserInput(buf, userInput);
