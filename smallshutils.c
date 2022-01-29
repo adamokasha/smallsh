@@ -43,3 +43,38 @@ bool isEmptyString(char *buf)
 
   return false;
 }
+
+bool isComment(char *buf)
+{
+  if (buf[0] == '#')
+    return true;
+  return false;
+}
+
+bool isInputCharacter(char *character)
+{
+  if (character == NULL)
+    return false;
+  return strcmp(character, ">") == 0;
+}
+
+bool isOutputCharacter(char *character)
+{
+  if (character == NULL)
+    return false;
+  return strcmp(character, "<") == 0;
+}
+
+bool isBackgroundExecChar(char *character)
+{
+  if (character == NULL)
+    return false;
+  return strcmp(character, "&") == 0;
+}
+
+bool isArgument(char *str)
+{
+  if (str == NULL)
+    return false;
+  return !(isInputCharacter(str) || isOutputCharacter(str) || isBackgroundExecChar(str));
+}
