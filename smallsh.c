@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <unistd.h> // getpid
 
 struct UserInput
 {
@@ -76,6 +77,85 @@ bool isArgument(char *str)
   return (strcmp(str, "<") != 0) && (strcmp(str, ">") != 0) && (strcmp(str, "&") != 0);
 }
 
+char *handleExpansion(char *str)
+{
+  char *strCopy = calloc(strlen(str) + 1, sizeof(char));
+  strCopy = strcpy(strCopy, str);
+  char *strCopyPtr = strCopy;
+  char *expanded = calloc(strlen(str) + 1, sizeof(char));
+
+  char *ptrOne = strCopy;
+  char *ptrTwo = NULL;
+  char *expandedPtr = expanded;
+
+  // ptrTwo = strstr(strCopy, "$$");
+
+  // if (ptrTwo == NULL)
+  // {
+  //   free(strCopy);
+  //   strCopy = NULL;
+  //   return str;
+  // }
+  // else
+  // {
+  char *strPid = calloc(6, sizeof(char));
+  sprintf(strPid, "%d", getpid());
+  // expanded = realloc(expanded, (strlen(expanded) + strlen(strPid) + 1) * sizeof(char));
+  // while (ptrOne < ptrTwo)
+  // {
+  //   *expandedPtr = *ptrOne;
+  //   ptrOne++;
+  //   expandedPtr++;
+  // }
+  // strcat(expanded, strPid);
+
+  // ptrTwo = strstr(ptrOne, "$$");
+  // ptrTwo = strstr(strCopy, "$$");
+
+  while ((ptrTwo = strstr(strCopy, "$$")) != NULL)
+  {
+    int strSize = strlen(expanded) + strlen(strPid) + 1;
+    int expLength = strlen(expanded);
+    int strPidLength = strlen(strPid);
+    int bytes = strSize * sizeof(char);
+    expanded = (char *)realloc(expanded, strSize * sizeof(char));
+    int l = strlen(expanded);
+    int s = sizeof(expanded);
+    expandedPtr = expanded + strlen(expanded);
+    while (ptrOne < ptrTwo)
+    {
+      *expandedPtr = *ptrOne;
+      ptrOne++;
+      expandedPtr++;
+    }
+    strcat(expanded, strPid);
+    strCopy = ptrTwo + 2;
+    ptrOne = strCopy;
+    // move the pointer building the expanded string forward by the length of the pid
+    expandedPtr += strlen(strPid);
+  }
+
+  if (strCopy != NULL)
+  {
+    expanded = (char *)realloc(expanded, (strlen(expanded) + strlen(strCopy) + 1) * sizeof(char));
+    strcat(expanded, strCopy);
+  }
+
+  free(strCopyPtr);
+  strCopyPtr = NULL;
+
+  strCopy = NULL;
+
+  ptrOne = NULL;
+  ptrTwo = NULL;
+  expandedPtr = NULL;
+
+  free(strPid);
+  strPid = NULL;
+
+  return expanded;
+}
+
 void buildUserInput(char *buf, struct UserInput *userInput)
 {
   char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
@@ -93,10 +173,13 @@ void buildUserInput(char *buf, struct UserInput *userInput)
 
   while (isArgument(token))
   {
-    userInput->args[i] = calloc(strlen(token + 1), sizeof(char));
-    strcpy(userInput->args[i], token);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+    userInput->args[i] = calloc(strlen(expanded + 1), sizeof(char));
+    strcpy(userInput->args[i], expanded);
     token = strtok_r(NULL, " ", &savePtr);
     i++;
+    expanded = NULL;
   }
 }
 
