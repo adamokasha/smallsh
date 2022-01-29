@@ -88,39 +88,12 @@ char *handleExpansion(char *str)
   char *ptrTwo = NULL;
   char *expandedPtr = expanded;
 
-  // ptrTwo = strstr(strCopy, "$$");
-
-  // if (ptrTwo == NULL)
-  // {
-  //   free(strCopy);
-  //   strCopy = NULL;
-  //   return str;
-  // }
-  // else
-  // {
   char *strPid = calloc(6, sizeof(char));
   sprintf(strPid, "%d", getpid());
-  // expanded = realloc(expanded, (strlen(expanded) + strlen(strPid) + 1) * sizeof(char));
-  // while (ptrOne < ptrTwo)
-  // {
-  //   *expandedPtr = *ptrOne;
-  //   ptrOne++;
-  //   expandedPtr++;
-  // }
-  // strcat(expanded, strPid);
-
-  // ptrTwo = strstr(ptrOne, "$$");
-  // ptrTwo = strstr(strCopy, "$$");
 
   while ((ptrTwo = strstr(strCopy, "$$")) != NULL)
   {
-    int strSize = strlen(expanded) + strlen(strPid) + 1;
-    int expLength = strlen(expanded);
-    int strPidLength = strlen(strPid);
-    int bytes = strSize * sizeof(char);
-    expanded = (char *)realloc(expanded, strSize * sizeof(char));
-    int l = strlen(expanded);
-    int s = sizeof(expanded);
+    expanded = (char *)realloc(expanded, (strlen(expanded) + strlen(strPid) + 1) * sizeof(char));
     expandedPtr = expanded + strlen(expanded);
     while (ptrOne < ptrTwo)
     {
