@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <unistd.h> // getpid
 
+#include "smallshutils.h"
+
 struct UserInput
 {
   char *command;
@@ -16,20 +18,20 @@ struct UserInput
   bool isBackgroundProcess;
 };
 
-/*
-  Removes a trailing '\n' from character string
-*/
-void cleanTrailingNewlineFromString(char *str)
-{
-  char *newLinePtr = str + (strlen(str) - 1);
+// /*
+//   Removes a trailing '\n' from character string
+// */
+// void cleanTrailingNewlineFromString(char *str)
+// {
+//   char *newLinePtr = str + (strlen(str) - 1);
 
-  if (*newLinePtr == '\n')
-  {
-    *newLinePtr = '\0';
-  }
+//   if (*newLinePtr == '\n')
+//   {
+//     *newLinePtr = '\0';
+//   }
 
-  newLinePtr = NULL;
-}
+//   newLinePtr = NULL;
+// }
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -44,29 +46,29 @@ bool isComment(char *buf)
   return false;
 }
 
-bool isEmptyString(char *buf)
-{
-  char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
-  strcpy(bufCopy, buf);
-  char *token = NULL;
-  char *savePtr = NULL;
+// bool isEmptyString(char *buf)
+// {
+//   char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
+//   strcpy(bufCopy, buf);
+//   char *token = NULL;
+//   char *savePtr = NULL;
 
-  token = strtok_r(bufCopy, " ", &savePtr);
+//   token = strtok_r(bufCopy, " ", &savePtr);
 
-  if (token == NULL)
-  {
-    free(bufCopy);
-    bufCopy = NULL;
-    // TODO: remove
-    printf("TOKEN IS NULL\n");
-    return true;
-  }
+//   if (token == NULL)
+//   {
+//     free(bufCopy);
+//     bufCopy = NULL;
+//     // TODO: remove
+//     printf("TOKEN IS NULL\n");
+//     return true;
+//   }
 
-  free(bufCopy);
-  bufCopy = NULL;
+//   free(bufCopy);
+//   bufCopy = NULL;
 
-  return false;
-}
+//   return false;
+// }
 
 bool isInputCharacter(char *character)
 {
