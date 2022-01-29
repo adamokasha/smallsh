@@ -9,7 +9,7 @@
 struct UserInput
 {
   char *command;
-  char args[512];
+  char *args[512];
   char *inputRedirect;
   char *outputRedirect;
   char *inputFile;
@@ -54,7 +54,8 @@ bool isEmptyString(char *buf)
 
   token = strtok_r(bufCopy, " ", &savePtr);
 
-  if (token == NULL) {
+  if (token == NULL)
+  {
     free(bufCopy);
     bufCopy = NULL;
     // TODO: remove
@@ -68,7 +69,38 @@ bool isEmptyString(char *buf)
   return false;
 }
 
-void parseUserInput(char *buf)
+bool isArgument(char *str)
+{
+  if (str == NULL)
+    return false;
+  return (strcmp(str, "<") != 0) && (strcmp(str, ">") != 0) && (strcmp(str, "&") != 0);
+}
+
+void buildUserInput(char *buf, struct UserInput *userInput)
+{
+  char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
+  strcpy(bufCopy, buf);
+  char *token = NULL;
+  char *savePtr = NULL;
+
+  token = strtok_r(bufCopy, " ", &savePtr);
+
+  userInput->command = calloc(strlen(token) + 1, sizeof(char));
+  strcpy(userInput->command, token);
+
+  token = strtok_r(NULL, " ", &savePtr);
+  int i = 0;
+
+  while (isArgument(token))
+  {
+    userInput->args[i] = calloc(strlen(token + 1), sizeof(char));
+    strcpy(userInput->args[i], token);
+    token = strtok_r(NULL, " ", &savePtr);
+    i++;
+  }
+}
+
+void parseUserInput(char *buf, struct UserInput *userInput)
 {
   cleanTrailingNewlineFromString(buf);
 
@@ -78,15 +110,17 @@ void parseUserInput(char *buf)
     printf("Is comment or empty string.\n");
     return;
   }
+  buildUserInput(buf, userInput);
 }
 
 int main()
 {
   char *buf = NULL;
   size_t buflen;
+  struct UserInput *userInput = malloc(sizeof(struct UserInput));
 
   prompt(&buf, &buflen);
-  parseUserInput(buf);
+  parseUserInput(buf, userInput);
   fflush(stdin);
 
   free(buf);
