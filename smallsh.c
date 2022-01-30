@@ -23,8 +23,6 @@ void parseUserInput(char *buf, struct UserInput *userInput)
 
   if (isComment(buf) || isEmptyString(buf))
   {
-    // TODO: remove
-    printf("Is comment or empty string.\n");
     return;
   }
   buildUserInput(buf, userInput);
@@ -64,7 +62,10 @@ int main()
     parseUserInput(buf, userInput);
     fflush(stdin);
 
-    execUserCommand(userInput);
+    if (userInput->command != NULL)
+    {
+      execUserCommand(userInput);
+    }
 
     free(buf);
     buf = NULL;

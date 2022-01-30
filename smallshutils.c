@@ -39,8 +39,6 @@ bool isEmptyString(char *buf)
   {
     free(bufCopy);
     bufCopy = NULL;
-    // TODO: remove
-    printf("TOKEN IS NULL\n");
     return true;
   }
 
