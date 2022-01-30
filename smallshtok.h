@@ -9,3 +9,4 @@ struct UserInput
 
 char *handleExpansion(char *str);
 void buildUserInput(char *buf, struct UserInput *userInput);
+void freeUserInput(struct UserInput *userInput);

@@ -150,3 +150,35 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     userInput->isBackgroundProcess = true;
   }
 }
+
+/*
+  Free memory allocated to UserInput and members
+*/
+void freeUserInput(struct UserInput *userInput) {
+  if (userInput->command != NULL) {
+    free(userInput->command);
+    userInput->command = NULL;
+  }
+  
+  int i = 0;
+  while (i < 512) {
+    free(userInput->args[i]);
+    userInput->args[i] = NULL;
+    i++;
+  }
+
+  if (userInput->inputFile != NULL) {
+    free(userInput->inputFile);
+    userInput->inputFile = NULL;
+  }
+
+  if (userInput->outputFile != NULL) {
+    free(userInput->outputFile);
+    userInput->outputFile = NULL;
+  }
+
+  userInput->isBackgroundProcess = NULL;
+
+  free(userInput);
+  userInput = NULL;
+}

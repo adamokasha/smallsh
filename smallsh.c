@@ -53,11 +53,12 @@ int main()
 {
   char *buf = NULL;
   size_t buflen;
-  struct UserInput *userInput = malloc(sizeof(struct UserInput));
-  userInput->isBackgroundProcess = false;
 
   while (1)
   {
+    struct UserInput *userInput = malloc(sizeof(struct UserInput));
+    userInput->isBackgroundProcess = false;
+
     prompt(&buf, &buflen);
     parseUserInput(buf, userInput);
     fflush(stdin);
@@ -69,5 +70,7 @@ int main()
 
     free(buf);
     buf = NULL;
+
+    freeUserInput(userInput);
   }
 }
