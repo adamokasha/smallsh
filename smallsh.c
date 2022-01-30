@@ -10,6 +10,7 @@
 
 #include "smallshutils.h"
 #include "smallshtok.h"
+#include "smallshcd.h"
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -37,7 +38,7 @@ void execUserCommand(struct UserInput *userInput)
   }
   else if (strcmp(userInput->command, "cd") == 0)
   {
-    printf("Executing cd\n");
+    smallshcd(userInput->args[0]);
   }
   else if (strcmp(userInput->command, "status") == 0)
   {

@@ -1,0 +1,1 @@
+void smallshcd(char *dir);
