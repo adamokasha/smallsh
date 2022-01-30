@@ -8,7 +8,7 @@
 #include "smallshutils.h"
 
 /*
-  Removes a trailing '\n' from character string
+  Removes a trailing "\n" from character string
 */
 void cleanTrailingNewlineFromString(char *str)
 {
@@ -22,6 +22,10 @@ void cleanTrailingNewlineFromString(char *str)
   newLinePtr = NULL;
 }
 
+/*
+  Checks if a string is empty
+  Uses empty space as delimiter to strtok_r
+*/
 bool isEmptyString(char *buf)
 {
   char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
@@ -46,6 +50,9 @@ bool isEmptyString(char *buf)
   return false;
 }
 
+/*
+  Checks if char is a comment
+*/
 bool isComment(char *buf)
 {
   if (buf[0] == '#')
@@ -53,6 +60,9 @@ bool isComment(char *buf)
   return false;
 }
 
+/*
+  Checks if char is ">" or input symbol
+*/
 bool isInputCharacter(char *character)
 {
   if (character == NULL)
@@ -60,6 +70,9 @@ bool isInputCharacter(char *character)
   return strcmp(character, ">") == 0;
 }
 
+/*
+  Checks if char is "<" or output symbol
+*/
 bool isOutputCharacter(char *character)
 {
   if (character == NULL)
@@ -67,6 +80,9 @@ bool isOutputCharacter(char *character)
   return strcmp(character, "<") == 0;
 }
 
+/*
+  Checks if char is "&" or use background process flag
+*/
 bool isBackgroundExecChar(char *character)
 {
   if (character == NULL)
@@ -74,6 +90,10 @@ bool isBackgroundExecChar(char *character)
   return strcmp(character, "&") == 0;
 }
 
+/*
+  Checks if str is arguments in entire user input
+  ie. If it is neither input symbol, output symbol or background exec flag
+*/
 bool isArgument(char *str)
 {
   if (str == NULL)

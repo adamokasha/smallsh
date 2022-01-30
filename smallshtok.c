@@ -9,13 +9,33 @@
 #include "smallshtok.h"
 #include "smallshutils.h"
 
+/*
+  Expands $$ into the PID of currently running process
+  Takes each argument separately
+
+  This function uses a copy of string passed in and 3 pointers. Output is in `expanded`.
+  1. Point `ptrOne` to copy of string
+  Loop:
+    2. Point `ptrTwo` to result of finding substring $$ (the pointer result)
+    3. Reallocate memory for `expanded` increased size of $$ -> PID expansion
+    4. Backtrace `ptrOne` to copy all chars leading to `ptrTwo` (if needed)
+    5. Add Pids to `expanded`
+*/
 char *handleExpansion(char *str)
 {
+  // Use copy of string passed in
   char *strCopy = calloc(strlen(str) + 1, sizeof(char));
   strCopy = strcpy(strCopy, str);
+  // This pointer is used to later free strCopy
   char *strCopyPtr = strCopy;
+  // The expanded string to return
   char *expanded = calloc(strlen(str) + 1, sizeof(char));
 
+  /*
+    ptrOne is used to backtrace the characters to copy before reaching an expansion ($$)
+    ptrTwo points to where an expansion is encountered
+    expandedPtr is used to point to where to copy the chars pointed to by ptrOne (usually the end)
+  */
   char *ptrOne = strCopy;
   char *ptrTwo = NULL;
   char *expandedPtr = expanded;
@@ -23,6 +43,12 @@ char *handleExpansion(char *str)
   char *strPid = calloc(6, sizeof(char));
   sprintf(strPid, "%d", getpid());
 
+  /*
+    Citation 
+    Date accessed: 01/29/2022
+    Code adapted for this use case from post by user Jonathan Leffler
+    Citation: https://stackoverflow.com/questions/13482519/c-find-all-occurrences-of-substring
+  */
   while ((ptrTwo = strstr(strCopy, "$$")) != NULL)
   {
     expanded = (char *)realloc(expanded, (strlen(expanded) + strlen(strPid) + 1) * sizeof(char));
@@ -40,6 +66,10 @@ char *handleExpansion(char *str)
     expandedPtr += strlen(strPid);
   }
 
+  // If we've reached the end via strtok_r, but strCopy is not null
+  // the last part of the string needs to be copied (this occurs when
+  // the end of the string resembles $$somecharacters, where we want
+  // to preserve "somecharacters"
   if (strCopy != NULL)
   {
     expanded = (char *)realloc(expanded, (strlen(expanded) + strlen(strCopy) + 1) * sizeof(char));
@@ -61,6 +91,10 @@ char *handleExpansion(char *str)
   return expanded;
 }
 
+/*
+  This function uses handleExpansion and util functions to
+  place user input into UserInput struct
+*/
 void buildUserInput(char *buf, struct UserInput *userInput)
 {
   char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
