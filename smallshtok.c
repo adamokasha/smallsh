@@ -44,7 +44,7 @@ char *handleExpansion(char *str)
   sprintf(strPid, "%d", getpid());
 
   /*
-    Citation 
+    Citation
     Date accessed: 01/29/2022
     Code adapted for this use case from post by user Jonathan Leffler
     Citation: https://stackoverflow.com/questions/13482519/c-find-all-occurrences-of-substring
@@ -150,29 +150,58 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     userInput->isBackgroundProcess = true;
   }
 }
-
 /*
-  Free memory allocated to UserInput and members
-*/
-void freeUserInput(struct UserInput *userInput) {
-  if (userInput->command != NULL) {
-    free(userInput->command);
-    userInput->command = NULL;
-  }
+  Initialize UserInput struct members to NULL
   
+  This is to avoid the app aborting when calling
+  free on an invalid pointer which can happen on
+  repeated blank or comment input
+*/
+void initializeUserInput(struct UserInput *userInput)
+{
+  userInput->command = NULL;
+
   int i = 0;
   while (i < 512) {
-    free(userInput->args[i]);
     userInput->args[i] = NULL;
     i++;
   }
 
-  if (userInput->inputFile != NULL) {
+  userInput->inputFile = NULL;
+  userInput->outputFile = NULL;
+  userInput->isBackgroundProcess = NULL;
+}
+
+/*
+  Free memory allocated to UserInput and members
+*/
+void freeUserInput(struct UserInput *userInput)
+{
+  if (userInput->command != NULL)
+  {
+    free(userInput->command);
+    userInput->command = NULL;
+  }
+
+  int i = 0;
+  while (i < 512)
+  {
+    if (userInput->args[i] != NULL)
+    {
+      free(userInput->args[i]);
+      userInput->args[i] = NULL;
+    }
+    i++;
+  }
+
+  if (userInput->inputFile != NULL)
+  {
     free(userInput->inputFile);
     userInput->inputFile = NULL;
   }
 
-  if (userInput->outputFile != NULL) {
+  if (userInput->outputFile != NULL)
+  {
     free(userInput->outputFile);
     userInput->outputFile = NULL;
   }

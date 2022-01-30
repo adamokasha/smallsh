@@ -57,7 +57,7 @@ int main()
   while (1)
   {
     struct UserInput *userInput = malloc(sizeof(struct UserInput));
-    userInput->isBackgroundProcess = false;
+    initializeUserInput(userInput);
 
     prompt(&buf, &buflen);
     parseUserInput(buf, userInput);
@@ -68,9 +68,9 @@ int main()
       execUserCommand(userInput);
     }
 
+    freeUserInput(userInput);
+
     free(buf);
     buf = NULL;
-
-    freeUserInput(userInput);
   }
 }
