@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <unistd.h> // getpid
+#include <signal.h>
 
 #include "smallshutils.h"
 #include "smallshtok.h"
@@ -29,6 +30,27 @@ void parseUserInput(char *buf, struct UserInput *userInput)
   buildUserInput(buf, userInput);
 }
 
+void execUserCommand(struct UserInput *userInput)
+{
+  if (strcmp(userInput->command, "exit") == 0)
+  {
+    // TODO: kill each process individually?
+    kill(0, SIGKILL);
+  }
+  else if (strcmp(userInput->command, "cd") == 0)
+  {
+    printf("Executing cd\n");
+  }
+  else if (strcmp(userInput->command, "status") == 0)
+  {
+    printf("Executing status\n");
+  }
+  else
+  {
+    printf("Executing other command\n");
+  }
+}
+
 int main()
 {
   char *buf = NULL;
@@ -36,12 +58,15 @@ int main()
   struct UserInput *userInput = malloc(sizeof(struct UserInput));
   userInput->isBackgroundProcess = false;
 
-  prompt(&buf, &buflen);
-  parseUserInput(buf, userInput);
-  fflush(stdin);
+  while (1)
+  {
+    prompt(&buf, &buflen);
+    parseUserInput(buf, userInput);
+    fflush(stdin);
 
-  free(buf);
-  buf = NULL;
+    execUserCommand(userInput);
 
-  return EXIT_SUCCESS;
+    free(buf);
+    buf = NULL;
+  }
 }
