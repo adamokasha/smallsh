@@ -91,6 +91,21 @@ char *handleExpansion(char *str)
   return expanded;
 }
 
+void addCommandToUserInput(char *buf, struct UserInput *userInput) {
+  char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
+  strcpy(bufCopy, buf);
+  char *token = NULL;
+  char *savePtr = NULL;
+
+  token = strtok_r(bufCopy, " ", &savePtr);
+
+  userInput->command = calloc(strlen(token) + 1, sizeof(char));
+  strcpy(userInput->command, token);
+
+  free(bufCopy);
+  bufCopy = NULL;
+}
+
 /*
   This function uses handleExpansion and util functions to
   place user input into UserInput struct
@@ -102,12 +117,11 @@ void buildUserInput(char *buf, struct UserInput *userInput)
   char *token = NULL;
   char *savePtr = NULL;
 
+  // Add command to userInput->command for readability and easy access
+  addCommandToUserInput(buf, userInput);
+
   token = strtok_r(bufCopy, " ", &savePtr);
 
-  userInput->command = calloc(strlen(token) + 1, sizeof(char));
-  strcpy(userInput->command, token);
-
-  token = strtok_r(NULL, " ", &savePtr);
   int i = 0;
 
   while (isArgument(token))
