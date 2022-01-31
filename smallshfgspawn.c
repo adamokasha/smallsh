@@ -22,9 +22,8 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     // exit(1);
     break;
   case 0:
-    execlp(userInput->command, userInput->command, userInput->args);
-    // execlp("ls", "ls");
-    perror("execl");
+    execvp(userInput->command, userInput->args);
+    perror("execvp");
     exit(1);
     break;
   default:
