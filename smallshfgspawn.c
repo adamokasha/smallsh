@@ -29,7 +29,8 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       int result = dup2(sourceFD, 0);
       if (result == -1)
       {
-        perror("source dup2()");
+        perror("Error");
+        setCommandStatus(commandStatus, FORKED, 1);
         exit(1);
       }
     }
@@ -40,8 +41,9 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       printf("DESC %d", targetFD);
       if (result2 == -1)
       {
-        perror("target dup2()");
-        exit(2);
+        perror("Error");
+        setCommandStatus(commandStatus, FORKED, 1);
+        exit(1);
       }
     }
     execvp(userInput->command, userInput->args);
@@ -59,7 +61,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     {
       setCommandStatus(commandStatus, FORKED, childStatus);
     }
-    setCommandStatus(commandStatus, FORKED, childStatus);
+    // setCommandStatus(commandStatus, FORKED, childStatus); // TODO: remove
 
     // printf("PARENT(%d): child(%d) terminated. Exiting\n", getpid(), spawnPid);
     // exit(0);
