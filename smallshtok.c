@@ -90,8 +90,11 @@ char *handleExpansion(char *str)
 
   return expanded;
 }
-
-void addCommandToUserInput(char *buf, struct UserInput *userInput) {
+/*
+  Sets the UserInput member command for easy access and readability
+*/
+void setCommandToUserInput(char *buf, struct UserInput *userInput)
+{
   char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
   strcpy(bufCopy, buf);
   char *token = NULL;
@@ -107,6 +110,34 @@ void addCommandToUserInput(char *buf, struct UserInput *userInput) {
 }
 
 /*
+  Sets the UserInput members inputFile and outputFile based on
+  the result of strtok_r
+
+  Expects that the string has already been parsed passed the arguments
+*/
+void setRedirectionToUserInput(struct UserInput *userInput, char *token, char **savePtr)
+{
+  if (isInputCharacter(token))
+  {
+    token = strtok_r(NULL, " ", savePtr);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+
+    userInput->inputFile = calloc(strlen(expanded) + 1, sizeof(char));
+    strcpy(userInput->inputFile, expanded);
+  }
+  else if (isOutputCharacter(token))
+  {
+    token = strtok_r(NULL, " ", savePtr);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+
+    userInput->outputFile = calloc(strlen(expanded) + 1, sizeof(char));
+    strcpy(userInput->outputFile, expanded);
+  }
+}
+
+/*
   This function uses handleExpansion and util functions to
   place user input into UserInput struct
 */
@@ -118,7 +149,7 @@ void buildUserInput(char *buf, struct UserInput *userInput)
   char *savePtr = NULL;
 
   // Add command to userInput->command for readability and easy access
-  addCommandToUserInput(buf, userInput);
+  setCommandToUserInput(buf, userInput);
 
   token = strtok_r(bufCopy, " ", &savePtr);
 
@@ -135,27 +166,11 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     expanded = NULL;
   }
 
-  if (isInputCharacter(token))
-  {
-    token = strtok_r(NULL, " ", &savePtr);
-    char *expanded = NULL;
-    expanded = handleExpansion(token);
-
-    userInput->inputFile = calloc(strlen(token) + 1, sizeof(char));
-    strcpy(userInput->inputFile, expanded);
-  }
-
+  // < and > symbols can be ordered with either preceding 
+  // the other, so setRedirectionToUserInput is called twice
+  setRedirectionToUserInput(userInput, token, &savePtr);
   token = strtok_r(NULL, " ", &savePtr);
-
-  if (isOutputCharacter(token))
-  {
-    token = strtok_r(NULL, " ", &savePtr);
-    char *expanded = NULL;
-    expanded = handleExpansion(token);
-
-    userInput->outputFile = calloc(strlen(token) + 1, sizeof(char));
-    strcpy(userInput->outputFile, expanded);
-  }
+  setRedirectionToUserInput(userInput, token, &savePtr);
 
   token = strtok_r(NULL, " ", &savePtr);
 
@@ -166,7 +181,7 @@ void buildUserInput(char *buf, struct UserInput *userInput)
 }
 /*
   Initialize UserInput struct members to NULL
-  
+
   This is to avoid the app aborting when calling
   free on an invalid pointer which can happen on
   repeated blank or comment input
@@ -176,7 +191,8 @@ void initializeUserInput(struct UserInput *userInput)
   userInput->command = NULL;
 
   int i = 0;
-  while (i < 512) {
+  while (i < 512)
+  {
     userInput->args[i] = NULL;
     i++;
   }
