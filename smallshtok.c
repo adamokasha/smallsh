@@ -166,13 +166,22 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     expanded = NULL;
   }
 
-  // < and > symbols can be ordered with either preceding 
+  if (isBackgroundExecChar(token))
+  {
+    userInput->isBackgroundProcess = true;
+    token = strtok_r(NULL, " ", &savePtr);
+  }
+
+  // < and > symbols can be ordered with either preceding
   // the other, so setRedirectionToUserInput is called twice
   setRedirectionToUserInput(userInput, token, &savePtr);
   token = strtok_r(NULL, " ", &savePtr);
-  setRedirectionToUserInput(userInput, token, &savePtr);
 
-  token = strtok_r(NULL, " ", &savePtr);
+  if (token != NULL && strcmp(token, "&") != 0)
+  {
+    setRedirectionToUserInput(userInput, token, &savePtr);
+    token = strtok_r(NULL, " ", &savePtr);
+  }
 
   if (isBackgroundExecChar(token))
   {
