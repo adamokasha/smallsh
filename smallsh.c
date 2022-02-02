@@ -13,6 +13,7 @@
 #include "smallshcd.h"
 #include "smallshstatus.h"
 #include "smallshfgspawn.h"
+#include "smallshbgspawn.h"
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -51,7 +52,11 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
   else
   {
     // printf("Executing other command\n");
-    spawnForegroundProcess(userInput, commandStatus);
+    if (userInput->isBackgroundProcess) {
+      spawnBackgroundProcess(userInput, commandStatus);
+    } else {
+      spawnForegroundProcess(userInput, commandStatus);
+    }
   }
 }
 
