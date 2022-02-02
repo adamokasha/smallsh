@@ -47,7 +47,7 @@ char *handleExpansion(char *str)
     Citation
     Date accessed: 01/29/2022
     Code adapted for this use case from post by user Jonathan Leffler
-    Citation: https://stackoverflow.com/questions/13482519/c-find-all-occurrences-of-substring
+    Source URL: https://stackoverflow.com/questions/13482519/c-find-all-occurrences-of-substring
   */
   while ((ptrTwo = strstr(strCopy, "$$")) != NULL)
   {
