@@ -12,6 +12,7 @@
 #include "smallshtok.h"
 #include "smallshcd.h"
 #include "smallshstatus.h"
+#include "smallshfgspawn.h"
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -40,16 +41,17 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
   else if (strcmp(userInput->command, "cd") == 0)
   {
     setCommandStatus(commandStatus, BUILTIN, 0);
-    smallshcd(userInput->args[0]);
+    smallshcd(userInput->args[1]);
   }
   else if (strcmp(userInput->command, "status") == 0)
   {   
     printCommandStatus(commandStatus);
-    printf("Executing status\n");
+    // printf("Executing status\n");
   }
   else
   {
-    printf("Executing other command\n");
+    // printf("Executing other command\n");
+    spawnForegroundProcess(userInput, commandStatus);
   }
 }
 

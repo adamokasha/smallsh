@@ -47,7 +47,7 @@ char *handleExpansion(char *str)
     Citation
     Date accessed: 01/29/2022
     Code adapted for this use case from post by user Jonathan Leffler
-    Citation: https://stackoverflow.com/questions/13482519/c-find-all-occurrences-of-substring
+    Source URL: https://stackoverflow.com/questions/13482519/c-find-all-occurrences-of-substring
   */
   while ((ptrTwo = strstr(strCopy, "$$")) != NULL)
   {
@@ -90,6 +90,52 @@ char *handleExpansion(char *str)
 
   return expanded;
 }
+/*
+  Sets the UserInput member command for easy access and readability
+*/
+void setCommandToUserInput(char *buf, struct UserInput *userInput)
+{
+  char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
+  strcpy(bufCopy, buf);
+  char *token = NULL;
+  char *savePtr = NULL;
+
+  token = strtok_r(bufCopy, " ", &savePtr);
+
+  userInput->command = calloc(strlen(token) + 1, sizeof(char));
+  strcpy(userInput->command, token);
+
+  free(bufCopy);
+  bufCopy = NULL;
+}
+
+/*
+  Sets the UserInput members inputFile and outputFile based on
+  the result of strtok_r
+
+  Expects that the string has already been parsed passed the arguments
+*/
+void setRedirectionToUserInput(struct UserInput *userInput, char *token, char **savePtr)
+{
+  if (isInputCharacter(token))
+  {
+    token = strtok_r(NULL, " ", savePtr);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+
+    userInput->inputFile = calloc(strlen(expanded) + 1, sizeof(char));
+    strcpy(userInput->inputFile, expanded);
+  }
+  else if (isOutputCharacter(token))
+  {
+    token = strtok_r(NULL, " ", savePtr);
+    char *expanded = NULL;
+    expanded = handleExpansion(token);
+
+    userInput->outputFile = calloc(strlen(expanded) + 1, sizeof(char));
+    strcpy(userInput->outputFile, expanded);
+  }
+}
 
 /*
   This function uses handleExpansion and util functions to
@@ -102,12 +148,11 @@ void buildUserInput(char *buf, struct UserInput *userInput)
   char *token = NULL;
   char *savePtr = NULL;
 
+  // Add command to userInput->command for readability and easy access
+  setCommandToUserInput(buf, userInput);
+
   token = strtok_r(bufCopy, " ", &savePtr);
 
-  userInput->command = calloc(strlen(token) + 1, sizeof(char));
-  strcpy(userInput->command, token);
-
-  token = strtok_r(NULL, " ", &savePtr);
   int i = 0;
 
   while (isArgument(token))
@@ -121,27 +166,11 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     expanded = NULL;
   }
 
-  if (isInputCharacter(token))
-  {
-    token = strtok_r(NULL, " ", &savePtr);
-    char *expanded = NULL;
-    expanded = handleExpansion(token);
-
-    userInput->inputFile = calloc(strlen(token) + 1, sizeof(char));
-    strcpy(userInput->inputFile, expanded);
-  }
-
+  // < and > symbols can be ordered with either preceding 
+  // the other, so setRedirectionToUserInput is called twice
+  setRedirectionToUserInput(userInput, token, &savePtr);
   token = strtok_r(NULL, " ", &savePtr);
-
-  if (isOutputCharacter(token))
-  {
-    token = strtok_r(NULL, " ", &savePtr);
-    char *expanded = NULL;
-    expanded = handleExpansion(token);
-
-    userInput->outputFile = calloc(strlen(token) + 1, sizeof(char));
-    strcpy(userInput->outputFile, expanded);
-  }
+  setRedirectionToUserInput(userInput, token, &savePtr);
 
   token = strtok_r(NULL, " ", &savePtr);
 
@@ -152,7 +181,7 @@ void buildUserInput(char *buf, struct UserInput *userInput)
 }
 /*
   Initialize UserInput struct members to NULL
-  
+
   This is to avoid the app aborting when calling
   free on an invalid pointer which can happen on
   repeated blank or comment input
@@ -162,7 +191,8 @@ void initializeUserInput(struct UserInput *userInput)
   userInput->command = NULL;
 
   int i = 0;
-  while (i < 512) {
+  while (i < 512)
+  {
     userInput->args[i] = NULL;
     i++;
   }

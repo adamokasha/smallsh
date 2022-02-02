@@ -65,7 +65,7 @@ bool isInputCharacter(char *character)
 {
   if (character == NULL)
     return false;
-  return strcmp(character, ">") == 0;
+  return strcmp(character, "<") == 0;
 }
 
 /*
@@ -75,7 +75,7 @@ bool isOutputCharacter(char *character)
 {
   if (character == NULL)
     return false;
-  return strcmp(character, "<") == 0;
+  return strcmp(character, ">") == 0;
 }
 
 /*
