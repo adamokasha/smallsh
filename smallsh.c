@@ -68,8 +68,8 @@ int main()
     initializeUserInput(userInput);
 
     prompt(&buf, &buflen);
+    fflush(stdout);
     parseUserInput(buf, userInput);
-    fflush(stdin);
 
     if (userInput->command != NULL)
     {

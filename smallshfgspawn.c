@@ -27,6 +27,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
   {
   case -1:
     perror("Fork error\n");
+    fflush(stdout);
     exit(1);
     break;
   case 0:
@@ -43,6 +44,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       if (result == -1)
       {
         perror("Error");
+        fflush(stdout);
         setCommandStatus(commandStatus, FORKED, 1);
         exit(1);
       }
@@ -52,16 +54,17 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       int targetFD = open(userInput->outputFile, O_WRONLY | O_CREAT | O_TRUNC, 0640);
       // Redirect output
       int result2 = dup2(targetFD, 1);
-      printf("DESC %d", targetFD);
       if (result2 == -1)
       {
         perror("Error");
+        fflush(stdout);
         setCommandStatus(commandStatus, FORKED, 1);
         exit(1);
       }
     }
     execvp(userInput->command, userInput->args);
     perror("execvp");
+    fflush(stdout);
     exit(1);
     break;
   default:
