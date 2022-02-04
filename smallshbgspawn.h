@@ -1,1 +1,1 @@
-void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *commandStatus);
+void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *commandStatus, pid_t *spawnPids);

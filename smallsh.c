@@ -32,7 +32,7 @@ void parseUserInput(char *buf, struct UserInput *userInput)
   buildUserInput(buf, userInput);
 }
 
-void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandStatus)
+void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandStatus, pid_t *spawnPids)
 {
   if (strcmp(userInput->command, "exit") == 0)
   {
@@ -53,7 +53,7 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
   {
     // printf("Executing other command\n");
     if (userInput->isBackgroundProcess) {
-      spawnBackgroundProcess(userInput, commandStatus);
+      spawnBackgroundProcess(userInput, commandStatus, spawnPids);
     } else {
       spawnForegroundProcess(userInput, commandStatus);
     }
@@ -66,6 +66,7 @@ int main()
   size_t buflen;
 
   struct CommandStatus *commandStatus = malloc(sizeof(struct CommandStatus));
+  int spawnPids[100] = {0};
   
   while (1)
   {
@@ -78,7 +79,7 @@ int main()
 
     if (userInput->command != NULL)
     {
-      execUserCommand(userInput, commandStatus);
+      execUserCommand(userInput, commandStatus, spawnPids);
     }
 
     freeUserInput(userInput);
