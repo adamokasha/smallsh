@@ -81,6 +81,7 @@ int main()
     {
       execUserCommand(userInput, commandStatus, spawnPids);
     }
+    printSpawnStatus(spawnPids);
 
     freeUserInput(userInput);
 

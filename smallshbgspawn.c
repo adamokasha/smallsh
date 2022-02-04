@@ -14,7 +14,6 @@ const char devNULL[] = "/dev/null";
 
 void addSpawnPid(pid_t spawnPid, pid_t *spawnPids);
 void printSpawnPids(pid_t *spawnPids);
-void printSpawnStatus(pid_t *spawnPids);
 
 /*
   Spawns a background process (control is returned immediately to the shell)
@@ -87,7 +86,7 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     printf("Background pid is %d\n", spawnPid);
     fflush(stdout);
     addSpawnPid(spawnPid, spawnPids);
-    printSpawnStatus(spawnPids);
+    // printSpawnStatus(spawnPids);
     spawnPid = waitpid(spawnPid, &childStatus, WNOHANG);
 
     // TODO: ??
