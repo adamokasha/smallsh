@@ -1,9 +1,11 @@
-enum CommandType {
+enum CommandType
+{
   BUILTIN,
   FORKED
 };
 
-struct CommandStatus {
+struct CommandStatus
+{
   enum CommandType type;
   int statusCode;
 };
