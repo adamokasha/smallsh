@@ -5,8 +5,7 @@
 void setCommandStatus(
     struct CommandStatus *commandStatus,
     enum CommandType type,
-    int statusCode
-)
+    int statusCode)
 {
   commandStatus->type = type;
   commandStatus->statusCode = statusCode;

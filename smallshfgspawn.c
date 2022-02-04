@@ -15,7 +15,7 @@
   with optional input and output redirection
 
   Citation:
-  Adapted from code in CS344 Module 4 "Exploration: Process API - Monitoring Child Processes" 
+  Adapted from code in CS344 Module 4 "Exploration: Process API - Monitoring Child Processes"
   Source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-process-api-monitoring-child-processes?module_item_id=21835973
 */
 void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *commandStatus)
@@ -32,7 +32,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     break;
   case 0:
     /*
-      Citation for lines 38-62 
+      Citation for lines 38-62
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
       Source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-processes-and-i-slash-o?module_item_id=21835982
     */

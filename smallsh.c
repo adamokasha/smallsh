@@ -45,16 +45,19 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
     smallshcd(userInput->args[1]);
   }
   else if (strcmp(userInput->command, "status") == 0)
-  {   
+  {
     printCommandStatus(commandStatus);
     // printf("Executing status\n");
   }
   else
   {
     // printf("Executing other command\n");
-    if (userInput->isBackgroundProcess) {
+    if (userInput->isBackgroundProcess)
+    {
       spawnBackgroundProcess(userInput, commandStatus, spawnPids);
-    } else {
+    }
+    else
+    {
       spawnForegroundProcess(userInput, commandStatus);
     }
   }
@@ -67,7 +70,7 @@ int main()
 
   struct CommandStatus *commandStatus = malloc(sizeof(struct CommandStatus));
   int spawnPids[100] = {0};
-  
+
   while (1)
   {
     struct UserInput *userInput = malloc(sizeof(struct UserInput));
