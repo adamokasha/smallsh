@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#define _POSIX_C_SOURCE 199309L 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,7 @@
 #include <ctype.h>
 #include <unistd.h> // getpid
 #include <signal.h>
+#include <sys/types.h>
 
 #include "smallshutils.h"
 #include "smallshtok.h"
@@ -14,6 +16,8 @@
 #include "smallshstatus.h"
 #include "smallshfgspawn.h"
 #include "smallshbgspawn.h"
+#include "smallshsig.h"
+
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -67,9 +71,12 @@ int main()
 {
   char *buf = NULL;
   size_t buflen;
+  struct sigaction sigAction = {{0}};
 
   struct CommandStatus *commandStatus = malloc(sizeof(struct CommandStatus));
   int spawnPids[100] = {0};
+
+  ignore_SIGINT(sigAction);
 
   while (1)
   {

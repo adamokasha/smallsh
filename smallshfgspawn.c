@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#define _POSIX_C_SOURCE 199309L
 
 #include <sys/wait.h> // for waitpid
 #include <stdio.h>    // for printf and perror
@@ -9,6 +10,7 @@
 #include "smallshtok.h"
 #include "smallshstatus.h"
 #include "smallshfgspawn.h"
+#include "smallshsig.h"
 
 /*
   Spawns a foreground process (the parent will wait for command to execute before taking control)
@@ -22,6 +24,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
 {
   int childStatus;
   pid_t spawnPid = fork();
+  struct sigaction sigAction = {{0}};
 
   switch (spawnPid)
   {
@@ -31,6 +34,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     exit(1);
     break;
   case 0:
+    use_SIG_DFL(sigAction);
     /*
       Citation for lines 38-62
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
