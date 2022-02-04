@@ -13,11 +13,12 @@
 const char devNULL[] = "/dev/null";
 
 void addSpawnPid(pid_t spawnPid, pid_t *spawnPids);
-void printSpawnPids(pid_t *spawnPids);
 
 /*
   Spawns a background process (control is returned immediately to the shell)
   with optional input and output redirection
+
+  If input and/or output file is not specified, defaults to /dev/null for either or both
 
   Citation:
   Adapted from code in CS344 Module 4 "Exploration: Process API - Monitoring Child Processes"
@@ -39,7 +40,7 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     break;
   case 0:
     /*
-      Citation for lines 38-62
+      Citation for lines 46-79
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
       Source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-processes-and-i-slash-o?module_item_id=21835982
     */
@@ -86,23 +87,15 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     printf("Background pid is %d\n", spawnPid);
     fflush(stdout);
     addSpawnPid(spawnPid, spawnPids);
-    // printSpawnStatus(spawnPids);
     spawnPid = waitpid(spawnPid, &childStatus, WNOHANG);
-
-    // TODO: ??
-    if (childStatus != 0)
-    {
-      setCommandStatus(commandStatus, FORKED, 1);
-    }
-    else
-    {
-      setCommandStatus(commandStatus, FORKED, childStatus);
-    }
 
     break;
   }
 }
 
+/*
+  Adds a spawn pid to array of pid_t's (spawnPids)
+*/
 void addSpawnPid(pid_t spawnPid, pid_t *spawnPids)
 {
   int i = 0;
@@ -113,8 +106,6 @@ void addSpawnPid(pid_t spawnPid, pid_t *spawnPids)
     if (*pidPtr == 0)
     {
       *pidPtr = spawnPid;
-      // printf("%d\n", *pidPtr);
-      // fflush(stdout);
       break;
     }
     pidPtr++;
@@ -123,24 +114,10 @@ void addSpawnPid(pid_t spawnPid, pid_t *spawnPids)
   pidPtr = NULL;
 }
 
-void printSpawnPids(pid_t *spawnPids)
-{
-  int i = 0;
-  pid_t *pidPtr = spawnPids;
-
-  while (i < 100)
-  {
-    if (*pidPtr != 0)
-    {
-      printf("Spawn id: %d\n", *pidPtr);
-      fflush(stdout);
-    }
-    pidPtr++;
-    i++;
-  }
-  pidPtr = NULL;
-}
-
+/*
+  Checks spawnPids array for child pids and prints a message
+  if the child process was termianted
+*/
 void printSpawnStatus(pid_t *spawnPids)
 {
   int i = 0;
@@ -152,16 +129,18 @@ void printSpawnStatus(pid_t *spawnPids)
   {
     if (*pidPtr != 0)
     {
+      // If spawnPid is 0 then no status to report
       spawnPid = waitpid(*pidPtr, &childStatus, WNOHANG);
-      // printf("Pid: %d | Return value: %d | child status: %d\n", *pidPtr, spawnPid, childStatus);
-      // fflush(stdout);
 
+      // If we got back a spawn id greater than zero, we check for termination
       if (spawnPid > 0) {
         if (WIFEXITED(childStatus)){
           printf("Background pid %d exited normally with exit value %d\n", spawnPid, WEXITSTATUS(childStatus));
           *pidPtr = 0;
         }
-      } else if (spawnPid < 0) {
+      } 
+      // if we get back a spawn id less than 0, then the child terminated abnormally so we print a message
+      else if (spawnPid < 0) {
         if (WIFSIGNALED(childStatus)) {
           printf("Background pid %d exited abnormally with exit value %d\n", spawnPid, WTERMSIG(childStatus));
           *pidPtr = 0;
