@@ -13,6 +13,7 @@
 #include "smallshcd.h"
 #include "smallshstatus.h"
 #include "smallshfgspawn.h"
+#include "smallshbgspawn.h"
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -31,7 +32,7 @@ void parseUserInput(char *buf, struct UserInput *userInput)
   buildUserInput(buf, userInput);
 }
 
-void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandStatus)
+void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandStatus, pid_t *spawnPids)
 {
   if (strcmp(userInput->command, "exit") == 0)
   {
@@ -51,7 +52,11 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
   else
   {
     // printf("Executing other command\n");
-    spawnForegroundProcess(userInput, commandStatus);
+    if (userInput->isBackgroundProcess) {
+      spawnBackgroundProcess(userInput, commandStatus, spawnPids);
+    } else {
+      spawnForegroundProcess(userInput, commandStatus);
+    }
   }
 }
 
@@ -61,6 +66,7 @@ int main()
   size_t buflen;
 
   struct CommandStatus *commandStatus = malloc(sizeof(struct CommandStatus));
+  int spawnPids[100] = {0};
   
   while (1)
   {
@@ -68,13 +74,14 @@ int main()
     initializeUserInput(userInput);
 
     prompt(&buf, &buflen);
+    fflush(stdout);
     parseUserInput(buf, userInput);
-    fflush(stdin);
 
     if (userInput->command != NULL)
     {
-      execUserCommand(userInput, commandStatus);
+      execUserCommand(userInput, commandStatus, spawnPids);
     }
+    printSpawnStatus(spawnPids);
 
     freeUserInput(userInput);
 

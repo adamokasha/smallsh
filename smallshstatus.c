@@ -20,5 +20,5 @@ void printCommandStatus(struct CommandStatus *commandStatus)
   }
 
   printf("exit value: %d\n", commandStatus->statusCode);
-  fflush(stdin);
+  fflush(stdout);
 }
