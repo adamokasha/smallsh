@@ -130,21 +130,17 @@ void printSpawnStatus(pid_t *spawnPids)
       // If spawnPid is 0 then no status to report
       spawnPid = waitpid(*pidPtr, &childStatus, WNOHANG);
 
-      // If we got back a spawn id greater than zero, we check for termination
-      if (spawnPid > 0)
+      // If we got back a spawn id other than zero, we check for termination status
+      if (spawnPid != 0)
       {
         if (WIFEXITED(childStatus))
         {
           printf("Background pid %d exited normally with exit value %d\n", spawnPid, WEXITSTATUS(childStatus));
           *pidPtr = 0;
         }
-      }
-      // if we get back a spawn id less than 0, then the child terminated abnormally so we print a message
-      else if (spawnPid < 0)
-      {
         if (WIFSIGNALED(childStatus))
         {
-          printf("Background pid %d exited abnormally with exit value %d\n", spawnPid, WTERMSIG(childStatus));
+          printf("Background pid %d exited with signal %d\n", spawnPid, WTERMSIG(childStatus));
           *pidPtr = 0;
         }
       }
