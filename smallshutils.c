@@ -1,3 +1,7 @@
+/*
+  This file contains a set of utility functions to help with parsing
+  user input
+*/
 #define _GNU_SOURCE
 
 #include <stdio.h>

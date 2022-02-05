@@ -17,7 +17,9 @@
 #include "smallshbgspawn.h"
 #include "smallshsig.h"
 
-
+/*
+  Prompts user to enter a command
+*/
 int prompt(char **buf, size_t *buflen)
 {
   printf(": ");
@@ -36,6 +38,13 @@ void parseUserInput(char *buf, struct UserInput *userInput)
   buildUserInput(buf, userInput);
 }
 
+/*
+  Uses the data from UserInput struct to send the user command
+  to either:
+  - Built in commands: exit, cd & status
+  - Background child process (with & symbol or fgOnlyMode enabled)
+  - Foreground child process
+*/
 void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandStatus, pid_t *spawnPids)
 {
   if (strcmp(userInput->command, "exit") == 0)
@@ -82,7 +91,20 @@ int main()
     struct UserInput *userInput = malloc(sizeof(struct UserInput));
     initializeUserInput(userInput);
 
-    while ((inputResponse = prompt(&buf, &buflen)) == -1) {
+    /*
+      Citation
+      Adapted from comment thread. Used suggested solution by Philip Peiffer.
+      The signal that affects this particular block of code is the SIGTSTP
+      which is using a custom handler. The handler interrupts this getLine
+      in `prompt` and returns error (-1). This loop catches the error, clears
+      it and flushes stdout. This avoid the issue discussed in the thread,
+      of the foreground-only toggled message having either an extra newline
+      or in the case here, the prompt indicator ": " not appearing (but still
+      allowing input)
+      Source URL: https://edstem.org/us/courses/16718/discussion/1082723
+    */
+    while ((inputResponse = prompt(&buf, &buflen)) == -1)
+    {
       clearerr(stdin);
       printf("\n");
       fflush(stdout);

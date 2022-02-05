@@ -1,3 +1,10 @@
+/*
+  This file contains code for:
+  - Creating a background child and executing a command in that child
+  - Keeping track of all the background processes created in an array
+  - Checking the status of background children and printing how they were terminated and the 
+    status code or signal with which they were terminated
+*/
 #define _GNU_SOURCE
 
 #include <sys/wait.h> // for waitpid
@@ -19,7 +26,7 @@ void addSpawnPid(pid_t spawnPid, pid_t *spawnPids);
   Spawns a background process (control is returned immediately to the shell)
   with optional input and output redirection
 
-  If input and/or output file is not specified, defaults to /dev/null for either or both
+  If input and/or output file is not specified, defaults to `/dev/null` for either or both
 
   Citation:
   Adapted from code in CS344 Module 4 "Exploration: Process API - Monitoring Child Processes"
@@ -40,12 +47,15 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     exit(1);
     break;
   case 0:
+    register_ignore_SIGTSTP();
     /*
-      Citation for lines 46-79
+      Citation for lines 59-90
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
+      Here we check if input and output file are available in input struct
+      UserInput. If not use `/dev/null` for either/both. `dup2` is then used
+      to redirect input and output to the user entries or defaults.
       Source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-processes-and-i-slash-o?module_item_id=21835982
     */
-    register_ignore_SIGTSTP();
     if (userInput->inputFile != NULL)
     {
       sourceFD = open(userInput->inputFile, O_RDONLY);
@@ -56,6 +66,7 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     }
     // Redirect input
     int result = dup2(sourceFD, 0);
+    // handle redirection error
     if (result == -1)
     {
       perror("Error");
@@ -72,6 +83,7 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     }
     // Redirect output
     int result2 = dup2(targetFD, 1);
+    // handle redirection error
     if (result2 == -1)
     {
       perror("Error");
@@ -135,11 +147,13 @@ void printSpawnStatus(pid_t *spawnPids)
       // If we got back a spawn id other than zero, we check for termination status
       if (spawnPid != 0)
       {
+        // Check if a normal exit
         if (WIFEXITED(childStatus))
         {
           printf("Background pid %d exited normally with exit value %d\n", spawnPid, WEXITSTATUS(childStatus));
           *pidPtr = 0;
         }
+        // Check if exited via signal and print message indicating which signal caused exit
         if (WIFSIGNALED(childStatus))
         {
           printf("Background pid %d exited with signal %d\n", spawnPid, WTERMSIG(childStatus));

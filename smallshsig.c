@@ -1,4 +1,8 @@
-#define _POSIX_C_SOURCE 200809L 
+/*
+  This file contains code for registering sig actions and their
+  handlers where needed
+*/
+#define _POSIX_C_SOURCE 200809L
 
 #include <sys/types.h>
 #include <signal.h>
@@ -11,38 +15,66 @@
 
 int fgOnlyMode = 0;
 
-void register_ignore_SIGINT() {
+/*
+  Registers an sig_action to ignore SIGINT
+*/
+void register_ignore_SIGINT()
+{
   struct sigaction sigAction = {{0}};
   sigAction.sa_handler = SIG_IGN;
   sigAction.sa_flags = SA_RESTART;
   sigaction(SIGINT, &sigAction, NULL);
 }
 
-void register_restore_SIGINT() {
+/*
+  Restores the default behaviour of SIGINT
+  by registering a sig action
+*/
+void register_restore_SIGINT()
+{
   struct sigaction sigAction = {{0}};
   sigAction.sa_handler = SIG_DFL;
   sigAction.sa_flags = SA_RESTART;
   sigaction(SIGINT, &sigAction, NULL);
 }
 
-void register_ignore_SIGTSTP() {
+/*
+  Registers a sig action to ignore SIGTSTP
+*/
+void register_ignore_SIGTSTP()
+{
   struct sigaction sigAction = {{0}};
   sigAction.sa_handler = SIG_IGN;
   sigAction.sa_flags = SA_RESTART;
   sigaction(SIGTSTP, &sigAction, NULL);
 }
 
-void handle_SIGTSTP(int signo) {
+/*
+  This sig action handler is used for toggling
+  foreground-only mode in the application. Prints
+  a message to the terminal to inform the user if
+  foreground-only mode is active or inactive.
+
+  It relies on a global variable `fgOnlyMode`.
+  When it is set to 0, foreground only mode
+  is inactive, and when set 1 to, it is active.
+
+*/
+void handle_SIGTSTP(int signo)
+{
   char *activatingMessage = "\nEntering foreground-only mode (& is not ignored)\n";
   char *deactivatingMessage = "\nExiting foreground-only mode\n";
   char *currentMessage;
   int strLen;
 
-  if (fgOnlyMode == 0) {
+  if (fgOnlyMode == 0)
+  {
     currentMessage = activatingMessage;
     fgOnlyMode = 1;
     strLen = 50;
-  } else {
+  }
+  else
+  {
     currentMessage = deactivatingMessage;
     fgOnlyMode = 0;
     strLen = 30;
@@ -52,7 +84,13 @@ void handle_SIGTSTP(int signo) {
   currentMessage = NULL;
 }
 
-void register_toggle_fg_mode() {
+/*
+  Registers handle_SIGTSTP to a sig action
+  to provide toggling between foreground-only
+  on/off.
+*/
+void register_toggle_fg_mode()
+{
   struct sigaction sigAction = {{0}};
   sigAction.sa_handler = handle_SIGTSTP;
   sigfillset(&sigAction.sa_mask);
