@@ -27,17 +27,6 @@ int prompt(char **buf, size_t *buflen)
   return getline(buf, buflen, stdin);
 }
 
-void parseUserInput(char *buf, struct UserInput *userInput)
-{
-  cleanTrailingNewlineFromString(buf);
-
-  if (isComment(buf) || isEmptyString(buf))
-  {
-    return;
-  }
-  buildUserInput(buf, userInput);
-}
-
 /*
   Uses the data from UserInput struct to send the user command
   to either:
@@ -110,7 +99,8 @@ int main()
       fflush(stdout);
     }
 
-    parseUserInput(buf, userInput);
+    // Build the UserInput struct which contains command data
+    buildUserInput(buf, userInput);
 
     if (userInput->command != NULL)
     {

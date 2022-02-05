@@ -148,6 +148,13 @@ void setRedirectionToUserInput(struct UserInput *userInput, char *token, char **
 */
 void buildUserInput(char *buf, struct UserInput *userInput)
 {
+  cleanTrailingNewlineFromString(buf);
+
+  if (isComment(buf) || isEmptyString(buf))
+  {
+    return;
+  }
+
   char *bufCopy = calloc(strlen(buf) + 1, sizeof(char));
   strcpy(bufCopy, buf);
   char *token = NULL;
