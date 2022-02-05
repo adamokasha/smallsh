@@ -9,6 +9,7 @@
 #include "smallshtok.h"
 #include "smallshstatus.h"
 #include "smallshfgspawn.h"
+#include "smallshsig.h"
 
 /*
   Spawns a foreground process (the parent will wait for command to execute before taking control)
@@ -31,6 +32,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     exit(1);
     break;
   case 0:
+    register_restore_SIGINT();
     /*
       Citation for lines 38-62
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
@@ -43,9 +45,8 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       int result = dup2(sourceFD, 0);
       if (result == -1)
       {
-        perror("Error");
+        perror("Input file error");
         fflush(stdout);
-        setCommandStatus(commandStatus, FORKED, 1);
         exit(1);
       }
     }
@@ -56,9 +57,8 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       int result2 = dup2(targetFD, 1);
       if (result2 == -1)
       {
-        perror("Error");
+        perror("Output file error");
         fflush(stdout);
-        setCommandStatus(commandStatus, FORKED, 1);
         exit(1);
       }
     }
@@ -70,12 +70,14 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
   default:
     spawnPid = waitpid(spawnPid, &childStatus, 0);
 
-    if (childStatus != 0)
-    {
+    if (childStatus == SIGINT) {
+      printf("terminated by signal %d\n", SIGINT);
+      setCommandStatus(commandStatus, FORKED, SIGINT);
+    } 
+    else if (childStatus != 0) {
       setCommandStatus(commandStatus, FORKED, 1);
     }
-    else
-    {
+    else {
       setCommandStatus(commandStatus, FORKED, childStatus);
     }
 

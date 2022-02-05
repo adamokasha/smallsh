@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <unistd.h> // getpid
 #include <signal.h>
+#include <sys/types.h>
 
 #include "smallshutils.h"
 #include "smallshtok.h"
@@ -14,6 +15,8 @@
 #include "smallshstatus.h"
 #include "smallshfgspawn.h"
 #include "smallshbgspawn.h"
+#include "smallshsig.h"
+
 
 void prompt(char **buf, size_t *buflen)
 {
@@ -70,6 +73,8 @@ int main()
 
   struct CommandStatus *commandStatus = malloc(sizeof(struct CommandStatus));
   int spawnPids[100] = {0};
+
+  register_ignore_SIGINT();
 
   while (1)
   {
