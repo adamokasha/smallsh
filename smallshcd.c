@@ -2,6 +2,7 @@
   This file contains code for implementing the `cd` built-in command
 */
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include "smallshcd.h"
@@ -9,12 +10,11 @@
 
 /*
   Implementation of `cd`. Changes directory
-
-  TODO: directory not found
 */
 void smallshcd(char *dir)
 {
   char *buf = NULL;
+  int result;
 
   if (dir == NULL)
   {
@@ -22,7 +22,12 @@ void smallshcd(char *dir)
   }
   else
   {
-    chdir(dir);
+    result = chdir(dir);
+    if (result == -1)
+    {
+      perror("Error");
+      fflush(stdout);
+    }
   }
 
   free(buf);

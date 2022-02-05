@@ -2,6 +2,11 @@
   This file contains code for registering sig actions and their
   handlers where needed
 */
+/*
+  Citation
+  Solution for compiler error with sigaction struct "has initializer but incomplete type"
+  Citation: https://edstem.org/us/courses/16718/discussion/1062108
+*/
 #define _POSIX_C_SOURCE 200809L
 
 #include <sys/types.h>
@@ -20,6 +25,11 @@ int fgOnlyMode = 0;
 */
 void register_ignore_SIGINT()
 {
+  /*
+    Citation
+    Solution for compiler warnning "missing braces around initializer"
+    Source URL: https://stackoverflow.com/questions/13746033/how-to-repair-warning-missing-braces-around-initializer
+  */
   struct sigaction sigAction = {{0}};
   sigAction.sa_handler = SIG_IGN;
   sigAction.sa_flags = SA_RESTART;
@@ -58,11 +68,10 @@ void register_ignore_SIGTSTP()
   It relies on a global variable `fgOnlyMode`.
   When it is set to 0, foreground only mode
   is inactive, and when set 1 to, it is active.
-
 */
 void handle_SIGTSTP(int signo)
 {
-  char *activatingMessage = "\nEntering foreground-only mode (& is not ignored)\n";
+  char *activatingMessage = "\nEntering foreground-only mode (& is now ignored)\n";
   char *deactivatingMessage = "\nExiting foreground-only mode\n";
   char *currentMessage;
   int strLen;

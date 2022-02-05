@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
-#include <unistd.h> // getpid
+#include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 
@@ -25,17 +25,6 @@ int prompt(char **buf, size_t *buflen)
   printf(": ");
   fflush(stdout);
   return getline(buf, buflen, stdin);
-}
-
-void parseUserInput(char *buf, struct UserInput *userInput)
-{
-  cleanTrailingNewlineFromString(buf);
-
-  if (isComment(buf) || isEmptyString(buf))
-  {
-    return;
-  }
-  buildUserInput(buf, userInput);
 }
 
 /*
@@ -110,14 +99,15 @@ int main()
       fflush(stdout);
     }
 
-    parseUserInput(buf, userInput);
+    // Build the UserInput struct which contains command data
+    buildUserInput(buf, userInput);
 
     if (userInput->command != NULL)
     {
       execUserCommand(userInput, commandStatus, spawnPids);
     }
-    printSpawnStatus(spawnPids);
 
+    printSpawnStatus(spawnPids);
     freeUserInput(userInput);
 
     free(buf);

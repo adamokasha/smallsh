@@ -2,15 +2,15 @@
   This file contains code for:
   - Creating a background child and executing a command in that child
   - Keeping track of all the background processes created in an array
-  - Checking the status of background children and printing how they were terminated and the 
+  - Checking the status of background children and printing how they were terminated and the
     status code or signal with which they were terminated
 */
 #define _GNU_SOURCE
 
-#include <sys/wait.h> // for waitpid
-#include <stdio.h>    // for printf and perror
-#include <stdlib.h>   // for exit
-#include <unistd.h>   // for execv, getpid, fork
+#include <sys/wait.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #include "smallshtok.h"
@@ -49,7 +49,7 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
   case 0:
     register_ignore_SIGTSTP();
     /*
-      Citation for lines 59-90
+      Citation for lines 59-104
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
       Here we check if input and output file are available in input struct
       UserInput. If not use `/dev/null` for either/both. `dup2` is then used
@@ -64,12 +64,18 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     {
       sourceFD = open(devNULL, O_RDONLY);
     }
+    if (sourceFD == -1)
+    {
+      perror("Input file error");
+      fflush(stdout);
+      exit(1);
+    }
     // Redirect input
     int result = dup2(sourceFD, 0);
     // handle redirection error
     if (result == -1)
     {
-      perror("Error");
+      perror("Input redirect error");
       fflush(stdout);
       exit(1);
     }
@@ -81,17 +87,23 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     {
       targetFD = open(devNULL, O_WRONLY | O_CREAT | O_TRUNC, 0640);
     }
+    if (targetFD == -1)
+    {
+      perror("Output file error");
+      fflush(stdout);
+      exit(1);
+    }
     // Redirect output
     int result2 = dup2(targetFD, 1);
     // handle redirection error
     if (result2 == -1)
     {
-      perror("Error");
+      perror("Output redirect error");
       fflush(stdout);
       exit(1);
     }
     execvp(userInput->command, userInput->args);
-    perror("execvp");
+    perror("Error");
     fflush(stdout);
     exit(1);
     break;
