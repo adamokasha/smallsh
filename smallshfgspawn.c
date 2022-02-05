@@ -1,3 +1,8 @@
+/*
+  This file contains code for:
+  - Creating a child foreground process and executing a command with that child
+  - Setting the status of the child as control is returned to the parent
+*/
 #define _GNU_SOURCE
 
 #include <sys/wait.h> // for waitpid
@@ -34,8 +39,11 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
   case 0:
     register_restore_SIGINT();
     /*
-      Citation for lines 38-62
+      Citation for lines 49-72
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
+      Here we check if input and output file are available in input struct
+      UserInput.`dup2` is then used to redirect input and output to the files
+      specified by the user.
       Source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-processes-and-i-slash-o?module_item_id=21835982
     */
     if (userInput->inputFile != NULL)
@@ -70,15 +78,18 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
   default:
     spawnPid = waitpid(spawnPid, &childStatus, 0);
 
-    if (childStatus == SIGINT) {
+    if (childStatus == SIGINT)
+    {
       printf("terminated by signal %d\n", SIGINT);
       fflush(stdout);
       setCommandStatus(commandStatus, FORKED, SIGINT);
-    } 
-    else if (childStatus != 0) {
+    }
+    else if (childStatus != 0)
+    {
       setCommandStatus(commandStatus, FORKED, 1);
     }
-    else {
+    else
+    {
       setCommandStatus(commandStatus, FORKED, childStatus);
     }
 

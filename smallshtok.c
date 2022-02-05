@@ -1,3 +1,7 @@
+/*
+  This file contains code for tokenization of user input and transfer
+  to the UserInput struct to be used in executing commands
+*/
 #define _GNU_SOURCE
 
 #include <stdio.h>
@@ -90,6 +94,7 @@ char *handleExpansion(char *str)
 
   return expanded;
 }
+
 /*
   Sets the UserInput member command for easy access and readability
 */
@@ -166,6 +171,7 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     expanded = NULL;
   }
 
+  // check if '&' comes first
   if (isBackgroundExecChar(token))
   {
     userInput->isBackgroundProcess = true;
@@ -183,11 +189,13 @@ void buildUserInput(char *buf, struct UserInput *userInput)
     token = strtok_r(NULL, " ", &savePtr);
   }
 
+  // check if '&' comes last
   if (isBackgroundExecChar(token))
   {
     userInput->isBackgroundProcess = true;
   }
 }
+
 /*
   Initialize UserInput struct members to NULL
 
