@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
-#include <unistd.h> // getpid
+#include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 
@@ -106,8 +106,8 @@ int main()
     {
       execUserCommand(userInput, commandStatus, spawnPids);
     }
-    printSpawnStatus(spawnPids);
 
+    printSpawnStatus(spawnPids);
     freeUserInput(userInput);
 
     free(buf);

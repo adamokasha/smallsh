@@ -34,6 +34,6 @@ void printCommandStatus(struct CommandStatus *commandStatus)
     return;
   }
 
-  printf("exit value: %d\n", commandStatus->statusCode);
+  printf("exit value %d\n", commandStatus->statusCode);
   fflush(stdout);
 }

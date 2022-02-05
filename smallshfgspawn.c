@@ -5,10 +5,10 @@
 */
 #define _GNU_SOURCE
 
-#include <sys/wait.h> // for waitpid
-#include <stdio.h>    // for printf and perror
-#include <stdlib.h>   // for exit
-#include <unistd.h>   // for execv, getpid, fork
+#include <sys/wait.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #include "smallshtok.h"
@@ -39,7 +39,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
   case 0:
     register_restore_SIGINT();
     /*
-      Citation for lines 49-72
+      Citation for lines 49-85
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
       Here we check if input and output file are available in input struct
       UserInput.`dup2` is then used to redirect input and output to the files
@@ -49,11 +49,17 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     if (userInput->inputFile != NULL)
     {
       int sourceFD = open(userInput->inputFile, O_RDONLY);
+      if (sourceFD == -1)
+      {
+        perror("Input file error");
+        fflush(stdout);
+        exit(1);
+      }
       // Redirect input
       int result = dup2(sourceFD, 0);
       if (result == -1)
       {
-        perror("Input file error");
+        perror("Input redirect error");
         fflush(stdout);
         exit(1);
       }
@@ -61,6 +67,12 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
     if (userInput->outputFile != NULL)
     {
       int targetFD = open(userInput->outputFile, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+      if (targetFD == -1)
+      {
+        perror("Output file error");
+        fflush(stdout);
+        exit(1);
+      }
       // Redirect output
       int result2 = dup2(targetFD, 1);
       if (result2 == -1)
@@ -71,7 +83,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
       }
     }
     execvp(userInput->command, userInput->args);
-    perror("execvp");
+    perror("Error");
     fflush(stdout);
     exit(1);
     break;
