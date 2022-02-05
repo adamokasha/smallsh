@@ -6,12 +6,14 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void ignore_SIGINT(struct sigaction sigAction) {
+void register_ignore_SIGINT() {
+  struct sigaction sigAction = {{0}};
   sigAction.sa_handler = SIG_IGN;
   sigaction(SIGINT, &sigAction, NULL);
 }
 
-void use_SIG_DFL(struct sigaction sigAction) {
+void register_restore_SIGINT() {
+  struct sigaction sigAction = {{0}};
   sigAction.sa_handler = SIG_DFL;
   sigaction(SIGINT, &sigAction, NULL);
 }

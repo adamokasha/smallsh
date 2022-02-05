@@ -58,7 +58,6 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     {
       perror("Error");
       fflush(stdout);
-      setCommandStatus(commandStatus, FORKED, 1);
       exit(1);
     }
     if (userInput->outputFile != NULL)
@@ -75,7 +74,6 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
     {
       perror("Error");
       fflush(stdout);
-      setCommandStatus(commandStatus, FORKED, 1);
       exit(1);
     }
     execvp(userInput->command, userInput->args);
