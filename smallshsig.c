@@ -17,3 +17,9 @@ void register_restore_SIGINT() {
   sigAction.sa_handler = SIG_DFL;
   sigaction(SIGINT, &sigAction, NULL);
 }
+
+void register_ignore_SIGTSTP() {
+  struct sigaction sigAction = {{0}};
+  sigAction.sa_handler = SIG_IGN;
+  sigaction(SIGTSTP, &sigAction, NULL);
+}

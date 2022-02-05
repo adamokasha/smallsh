@@ -75,6 +75,7 @@ int main()
   int spawnPids[100] = {0};
 
   register_ignore_SIGINT();
+  register_ignore_SIGTSTP();
 
   while (1)
   {
