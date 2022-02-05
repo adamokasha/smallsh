@@ -9,6 +9,7 @@
 #include "smallshtok.h"
 #include "smallshstatus.h"
 #include "smallshbgspawn.h"
+#include "smallshsig.h"
 
 const char devNULL[] = "/dev/null";
 
@@ -44,6 +45,7 @@ void spawnBackgroundProcess(struct UserInput *userInput, struct CommandStatus *c
       Adapted from CS344 Module 5 "Exploration: Processes and I/O"
       Source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-processes-and-i-slash-o?module_item_id=21835982
     */
+    register_ignore_SIGTSTP();
     if (userInput->inputFile != NULL)
     {
       sourceFD = open(userInput->inputFile, O_RDONLY);

@@ -72,6 +72,7 @@ void spawnForegroundProcess(struct UserInput *userInput, struct CommandStatus *c
 
     if (childStatus == SIGINT) {
       printf("terminated by signal %d\n", SIGINT);
+      fflush(stdout);
       setCommandStatus(commandStatus, FORKED, SIGINT);
     } 
     else if (childStatus != 0) {

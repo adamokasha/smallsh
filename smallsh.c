@@ -18,10 +18,11 @@
 #include "smallshsig.h"
 
 
-void prompt(char **buf, size_t *buflen)
+int prompt(char **buf, size_t *buflen)
 {
   printf(": ");
-  getline(buf, buflen, stdin);
+  fflush(stdout);
+  return getline(buf, buflen, stdin);
 }
 
 void parseUserInput(char *buf, struct UserInput *userInput)
@@ -50,12 +51,10 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
   else if (strcmp(userInput->command, "status") == 0)
   {
     printCommandStatus(commandStatus);
-    // printf("Executing status\n");
   }
   else
   {
-    // printf("Executing other command\n");
-    if (userInput->isBackgroundProcess)
+    if (userInput->isBackgroundProcess && fgOnlyMode != 1)
     {
       spawnBackgroundProcess(userInput, commandStatus, spawnPids);
     }
@@ -70,19 +69,25 @@ int main()
 {
   char *buf = NULL;
   size_t buflen;
-
   struct CommandStatus *commandStatus = malloc(sizeof(struct CommandStatus));
   int spawnPids[100] = {0};
+  int inputResponse;
 
   register_ignore_SIGINT();
+  register_ignore_SIGTSTP();
+  register_toggle_fg_mode();
 
   while (1)
   {
     struct UserInput *userInput = malloc(sizeof(struct UserInput));
     initializeUserInput(userInput);
 
-    prompt(&buf, &buflen);
-    fflush(stdout);
+    while ((inputResponse = prompt(&buf, &buflen)) == -1) {
+      clearerr(stdin);
+      printf("\n");
+      fflush(stdout);
+    }
+
     parseUserInput(buf, userInput);
 
     if (userInput->command != NULL)
