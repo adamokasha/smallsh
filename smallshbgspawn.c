@@ -180,3 +180,26 @@ void printSpawnStatus(pid_t *spawnPids)
 
   pidPtr = NULL;
 }
+
+/*
+  Kills background processes that were not terminated and
+  saved to spawnPids array
+*/
+void killBackgroundProcesses(pid_t *spawnPids)
+{
+  int i = 0;
+  pid_t *pidPtr = spawnPids;
+
+  while (i < 100)
+  {
+    if (*pidPtr != 0)
+    {
+      kill(*pidPtr, SIGKILL);
+    }
+
+    pidPtr++;
+    i++;
+  }
+
+  pidPtr = NULL;
+}
