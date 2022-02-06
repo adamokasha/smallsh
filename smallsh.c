@@ -38,7 +38,8 @@ void execUserCommand(struct UserInput *userInput, struct CommandStatus *commandS
 {
   if (strcmp(userInput->command, "exit") == 0)
   {
-    // TODO: kill each process individually?
+    // kill background processes saved to array
+    killBackgroundProcesses(spawnPids);
     kill(0, SIGKILL);
   }
   else if (strcmp(userInput->command, "cd") == 0)
