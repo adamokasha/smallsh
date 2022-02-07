@@ -4,10 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <ctype.h>
-#include <unistd.h>
 #include <signal.h>
-#include <sys/types.h>
 
 #include "smallshutils.h"
 #include "smallshtok.h"
