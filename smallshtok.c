@@ -5,10 +5,9 @@
 #define _GNU_SOURCE
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h> // getpid
+#include <unistd.h>
 
 #include "smallshtok.h"
 #include "smallshutils.h"
