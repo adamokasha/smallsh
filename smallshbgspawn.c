@@ -163,7 +163,7 @@ void printSpawnStatus(pid_t *spawnPids)
         // Check if a normal exit
         if (WIFEXITED(childStatus))
         {
-          printf("Background pid %d exited normally with exit value %d\n", spawnPid, WEXITSTATUS(childStatus));
+          printf("Background pid %d exited with value %d\n", spawnPid, WEXITSTATUS(childStatus));
           *pidPtr = 0;
         }
         // Check if exited via signal and print message indicating which signal caused exit
